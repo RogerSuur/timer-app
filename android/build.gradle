@@ -1,3 +1,5 @@
+buildscript {
+ext.kotlin_version = '1.5.31'
 allprojects {
     repositories {
         google()
@@ -15,4 +17,5 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
+}
 }

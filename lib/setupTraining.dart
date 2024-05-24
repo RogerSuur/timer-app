@@ -13,6 +13,14 @@ class _SetupTrainingState extends State<SetupTraining> {
   final TextEditingController breakLengthController = TextEditingController();
   final TextEditingController roundAmountController = TextEditingController();
 
+  // late List<Color> currentColors;
+  // //break colors
+  // final List<Color> breakColors = [
+  //   Color(0xFF2F4F4F),
+  //   const Color.fromRGBO(192, 174, 74, 1),
+  //   const Color.fromRGBO(0, 0, 0, 1),
+  // ];
+
   @override
   Widget build(BuildContext context) {
     void setupWorkOutButton() {
@@ -26,8 +34,12 @@ class _SetupTrainingState extends State<SetupTraining> {
           roundLength == 0 ||
           breakLength == 0 ||
           roundAmount == 0) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Please enter valid numbers for all fields.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+            'Please enter valid numbers for all fields.',
+            style: TextStyle(fontSize: 20),
+          ),
+        ));
         return; // Early exit if validation fails
       }
 
@@ -40,81 +52,64 @@ class _SetupTrainingState extends State<SetupTraining> {
     }
 
     return Scaffold(
-      backgroundColor: Color(0xFF2F4F4F),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Configure your workout:",
-              // style: Theme.of(context).textTheme.titleLarge,
-              style: TextStyle(
-                  color: Colors.cyanAccent,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            buildTextField(
-              controller: roundLengthController,
-              icon: Icons.timer,
-              label: "Round length (minutes)",
-            ),
-            // TextField(
-            //   controller: roundLenghtController,
-            //   keyboardType: TextInputType.number,
-            //   decoration: InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       prefixIcon: Icon(Icons.timer),
-            //       labelText: 'Round length'),
-            // ),
-            SizedBox(
-              height: 10,
-            ),
-            // TextField(
-            //   controller: breakLengthController,
-            //   keyboardType: TextInputType.number,
-            //   decoration: InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       prefixIcon: Icon(Icons.pause_circle_filled),
-            //       labelText: "Break length"),
-            // ),
-            buildTextField(
-                controller: breakLengthController,
-                icon: Icons.pause_circle_filled,
-                label: "Break length (minutes)"),
-            SizedBox(
-              height: 10,
-            ),
-            // TextField(
-            //   controller: roundAmountController,
-            //   keyboardType: TextInputType.number,
-            //   decoration: InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       prefixIcon: Icon(Icons.repeat),
-            //       labelText: "Amount of rounds"),
-            // ),
-            buildTextField(
-                controller: roundAmountController,
-                icon: Icons.repeat,
-                label: "Amount of rounds"),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              child: Icon(
-                Icons.play_arrow,
-                size: 40,
-                color: Colors.white,
+      body: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [
+          const Color.fromRGBO(68, 138, 255, 1),
+          Color.fromRGBO(0, 0, 0, 1)
+        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        child: Padding(
+          padding: const EdgeInsets.all(36.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "Configure your workout:",
+                // style: Theme.of(context).textTheme.titleLarge,
+                style: TextStyle(
+                    color: Colors.cyanAccent,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
               ),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                backgroundColor: Colors.deepOrange,
+              const SizedBox(height: 20),
+              buildTextField(
+                controller: roundLengthController,
+                icon: Icons.timer,
+                label: "Round length (min)",
               ),
-              onPressed: setupWorkOutButton,
-            ),
-          ],
+              const SizedBox(
+                height: 10,
+              ),
+              buildTextField(
+                  controller: breakLengthController,
+                  icon: Icons.pause_circle_filled,
+                  label: "Break length (min)"),
+              const SizedBox(
+                height: 10,
+              ),
+              buildTextField(
+                  controller: roundAmountController,
+                  icon: Icons.repeat,
+                  label: "Amount of rounds"),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  backgroundColor: const Color(0xFF00BCD4),
+                ),
+                onPressed: setupWorkOutButton,
+                child: const Icon(
+                  Icons.play_arrow,
+                  size: 40,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -126,24 +121,23 @@ class _SetupTrainingState extends State<SetupTraining> {
     required String label,
   }) {
     return Container(
-      width: 220,
-      padding: EdgeInsets.only(bottom: 5),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.only(bottom: 5),
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(
-              color: Colors.cyanAccent, width: 2), // Underline thickness
+              color: Colors.cyanAccent, width: 1), // Underline thickness
         ),
       ),
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
-        style: TextStyle(fontSize: 18, color: Colors.white),
+        style: const TextStyle(fontSize: 24, color: Colors.white),
         decoration: InputDecoration(
           icon: Icon(icon, color: Colors.cyanAccent),
           labelText: label,
-          labelStyle: TextStyle(
+          labelStyle: const TextStyle(
               color: Colors.cyanAccent,
-              fontSize: 20,
+              fontSize: 23,
               fontWeight: FontWeight.bold),
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,

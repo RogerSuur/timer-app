@@ -1,17 +1,15 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:flutter/widgets.dart';
+//import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Training extends StatefulWidget {
   final int roundLength;
   final int breakLength;
   final int roundAmount;
 
-  Training(this.roundLength, this.breakLength, this.roundAmount);
+  const Training(this.roundLength, this.breakLength, this.roundAmount,
+      {super.key});
 
   @override
   State<Training> createState() => _TrainingState();
@@ -35,15 +33,15 @@ class _TrainingState extends State<Training> {
 
   //workout colors
   final List<Color> workoutColors = [
-    Color.fromRGBO(68, 138, 255, 1),
-    Color.fromRGBO(63, 81, 181, 1),
-    Color.fromRGBO(0, 0, 0, 1)
+    const Color.fromRGBO(68, 138, 255, 1),
+    const Color.fromRGBO(63, 81, 181, 1),
+    const Color.fromRGBO(0, 0, 0, 1)
   ];
   //break colors
   final List<Color> breakColors = [
-    Color.fromRGBO(187, 117, 0, 1),
-    Color.fromRGBO(192, 174, 74, 1),
-    Color.fromRGBO(0, 0, 0, 1),
+    const Color.fromRGBO(187, 117, 0, 1),
+    const Color.fromRGBO(192, 174, 74, 1),
+    const Color.fromRGBO(0, 0, 0, 1),
   ];
 
   late List<Color> currentColors;
@@ -57,11 +55,17 @@ class _TrainingState extends State<Training> {
     currentColors = workoutColors;
   }
 
+  void playSound(String fileName) {
+    final audioPlayer = AudioPlayer();
+    print("PLAY SOUND " + fileName);
+    audioPlayer.play(AssetSource(fileName));
+  }
+
   // void resetTimer() => setState(() => seconds = maxSeconds);
 
   void startTimer({bool reset = true}) {
     isPaused = false;
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
       // check which state is it
       checkState();
 
@@ -69,6 +73,10 @@ class _TrainingState extends State<Training> {
         case workoutState.trainingState:
           setState(() {
             totalSeconds--;
+            if (totalSeconds == 10) {
+              //playsound clap
+              playSound('sounds/clap.mp3');
+            }
             minutes = totalSeconds ~/ 60;
             seconds = totalSeconds % 60;
           });
@@ -81,6 +89,7 @@ class _TrainingState extends State<Training> {
           });
         case workoutState.completedState:
           stopTimer();
+          print("Workout completed.");
           break;
         default:
       }
@@ -99,21 +108,28 @@ class _TrainingState extends State<Training> {
   void checkState() {
     //check if client starts the workout
     if (state == workoutState.preTrainingState) {
+      //playSound('assets/sounds/dingdingding.mp3');
       state = workoutState.trainingState;
+      //playSound(dingDingDingAudioSource);
+      playSound('sounds/dingdingding.mp3');
     }
     //check if workout is completed
-    if (currentRound == widget.roundAmount) {
+    if (currentRound == widget.roundAmount && totalSeconds < 1) {
       state = workoutState.completedState;
       //check if round or break is completed
     } else if (totalSeconds == 0) {
       if (state == workoutState.breakState) {
         state = workoutState.trainingState;
         toggleBackground();
+        //playSound(dingDingDingAudioSource);
+        playSound('sounds/dingdingding.mp3');
         totalSeconds = widget.roundLength * 60;
       } else {
         currentRound++;
         state = workoutState.breakState;
         toggleBackground();
+        //playSound(dingAudioSource);
+        playSound('sounds/ding.mp3');
         totalSeconds = widget.breakLength * 60;
       }
       seconds = totalSeconds % 60;
@@ -132,7 +148,7 @@ class _TrainingState extends State<Training> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedContainer(
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 colors: currentColors,
@@ -241,7 +257,9 @@ class _TrainingState extends State<Training> {
     Color textColor = color ?? Colors.indigo.shade50;
 
     return Text(
-      '${minutes}:$formattedSeconds',
+      state == workoutState.completedState
+          ? "Completed"
+          : '$minutes:$formattedSeconds',
       style: TextStyle(
         fontSize: 100,
         color: textColor,
@@ -258,21 +276,20 @@ class ButtonWidget extends StatelessWidget {
   final VoidCallback onClicked;
 
   const ButtonWidget(
-      {Key? key,
+      {super.key,
       required this.text,
       this.color = Colors.white,
       this.backgroundColor = const Color(0xFF00BCD4),
-      required this.onClicked})
-      : super(key: key);
+      required this.onClicked});
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
       style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
+      onPressed: onClicked,
       child: Text(
         text,
         style: TextStyle(fontSize: 20, color: color),
-      ),
-      onPressed: onClicked);
+      ));
 }

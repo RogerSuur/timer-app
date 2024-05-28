@@ -61,80 +61,75 @@ class _TrainingState extends State<Training> {
     audioPlayer.play(AssetSource(fileName));
   }
 
-  // void resetTimer() => setState(() => seconds = maxSeconds);
+  void resetTimer() => setState(() {
+        totalSeconds = widget.roundLength * 60;
+        minutes = totalSeconds ~/ 60;
+        seconds = totalSeconds % 60;
+        currentColors = workoutColors;
+        isPaused = false;
+        state = workoutState.preTrainingState;
+      });
 
   void startTimer({bool reset = true}) {
     isPaused = false;
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      // check which state is it
-      checkState();
-
-      switch (state) {
-        case workoutState.trainingState:
-          setState(() {
-            totalSeconds--;
-            if (totalSeconds == 10) {
-              //playsound clap
-              playSound('sounds/clap.mp3');
-            }
-            minutes = totalSeconds ~/ 60;
-            seconds = totalSeconds % 60;
-          });
-          break;
-        case workoutState.breakState:
-          setState(() {
-            totalSeconds--;
-            minutes = totalSeconds ~/ 60;
-            seconds = totalSeconds % 60;
-          });
-        case workoutState.completedState:
-          stopTimer();
-          print("Workout completed.");
-          break;
-        default:
+      if (totalSeconds > 0) {
+        setState(() {
+          totalSeconds--;
+          minutes = totalSeconds ~/ 60;
+          seconds = totalSeconds % 60;
+        });
+        checkState();
+      } else {
+        stopTimer(reset: false);
+        print("Workout completed.");
       }
     });
   }
 
   void stopTimer({bool reset = true}) {
-    // if (reset) {
-    //   resetTimer();
-    // }
+    if (reset) {
+      resetTimer();
+    }
     isPaused = true;
 
     setState(() => timer?.cancel());
   }
 
+  //checks and changes the states of workout
   void checkState() {
     //check if client starts the workout
     if (state == workoutState.preTrainingState) {
-      //playSound('assets/sounds/dingdingding.mp3');
       state = workoutState.trainingState;
-      //playSound(dingDingDingAudioSource);
       playSound('sounds/dingdingding.mp3');
     }
-    //check if workout is completed
-    if (currentRound == widget.roundAmount && totalSeconds < 1) {
-      state = workoutState.completedState;
-      //check if round or break is completed
-    } else if (totalSeconds == 0) {
-      if (state == workoutState.breakState) {
-        state = workoutState.trainingState;
-        toggleBackground();
-        //playSound(dingDingDingAudioSource);
+    if (totalSeconds == 10) {
+      playSound('sounds/clap.mp3');
+    }
+    if (totalSeconds == 0) {
+      updateRoundOrBreakState();
+    }
+  }
+
+  //check if round or break is completed
+  void updateRoundOrBreakState() {
+    if (state == workoutState.breakState) {
+      state = workoutState.trainingState;
+      totalSeconds = widget.roundLength * 60;
+      playSound('sounds/dingdingding.mp3');
+    } else {
+      //check if workout is completed
+      currentRound++;
+      if (currentRound > widget.roundAmount) {
+        state = workoutState.completedState;
         playSound('sounds/dingdingding.mp3');
-        totalSeconds = widget.roundLength * 60;
       } else {
-        currentRound++;
         state = workoutState.breakState;
-        toggleBackground();
-        //playSound(dingAudioSource);
         playSound('sounds/ding.mp3');
         totalSeconds = widget.breakLength * 60;
       }
-      seconds = totalSeconds % 60;
-      minutes = totalSeconds ~/ 60;
     }
+    toggleBackground();
   }
 
   void toggleBackground() {
@@ -212,7 +207,10 @@ class _TrainingState extends State<Training> {
   }
 
   Widget showRounds({Color? color}) {
+    print("showROunds color $color");
     Color displayColor = color ?? Colors.indigo.shade50;
+
+    print("showROunds displayColor $displayColor");
 
     return Text(
       state == workoutState.trainingState ||

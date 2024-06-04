@@ -152,20 +152,25 @@ class _TrainingState extends State<Training> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              buildTimer(
-                  color: state == workoutState.breakState
-                      ? Colors.indigo.shade50
-                      : null),
+              //TimerDisplay
+              TimerDisplay(
+                totalSeconds: totalSeconds,
+                seconds: seconds,
+                minutes: minutes,
+                color: Colors.indigo.shade50,
+                state: state,
+                roundLength: widget.roundLength,
+                breakLength: widget.breakLength,
+              ),
               const SizedBox(
                 height: 40,
               ),
-              showRounds(
-                  color: state == workoutState.breakState
-                      ? Colors.indigo.shade50
-                      : null),
+              //RoundDisplay
+              showRounds(color: state == workoutState.breakState ? null : null),
               const SizedBox(
                 height: 60,
               ),
+              //ControlBUttons
               buildButtons(),
             ],
           ),
@@ -221,9 +226,67 @@ class _TrainingState extends State<Training> {
     );
   }
 
-  Widget buildTimer({Color? color}) {
-    Color displayColor = color ?? Colors.white;
+  // Widget buildTimer({Color? color}) {
+  //   Color displayColor = color ?? Colors.white;
 
+  //   return SizedBox(
+  //     width: 300,
+  //     height: 300,
+  //     child: Stack(
+  //       fit: StackFit.expand,
+  //       children: [
+  //         CircularProgressIndicator(
+  //           value: 1 -
+  //               (totalSeconds /
+  //                   (state == workoutState.trainingState
+  //                       ? widget.roundLength * 60
+  //                       : widget.breakLength * 60)),
+  //           valueColor: AlwaysStoppedAnimation(displayColor),
+  //           strokeWidth: 12,
+  //           color: displayColor,
+  //           backgroundColor: Colors.black54,
+  //         ),
+  //         Center(
+  //           child: BuildTime(
+  //               seconds: seconds,
+  //               state: state,
+  //               minutes: minutes,
+  //               color: displayColor),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+}
+
+class TimerDisplay extends StatelessWidget {
+  final int totalSeconds;
+  final int seconds;
+  final int minutes;
+  final Color color;
+  final workoutState state;
+  final int roundLength;
+  final int breakLength;
+
+  const TimerDisplay(
+      {super.key,
+      required this.totalSeconds,
+      required this.seconds,
+      required this.color,
+      required this.minutes,
+      required this.state,
+      required this.roundLength,
+      required this.breakLength});
+
+  // Color displayColor = color ?? Colors.white;
+
+  @override
+  Widget build(BuildContext context) {
+    double progress = 1 -
+        (totalSeconds /
+            (state == workoutState.trainingState
+                ? roundLength * 60
+                : breakLength * 60));
     return SizedBox(
       width: 300,
       height: 300,
@@ -231,26 +294,20 @@ class _TrainingState extends State<Training> {
         fit: StackFit.expand,
         children: [
           CircularProgressIndicator(
-            value: 1 -
-                (totalSeconds /
-                    (state == workoutState.trainingState
-                        ? widget.roundLength * 60
-                        : widget.breakLength * 60)),
-            valueColor: AlwaysStoppedAnimation(displayColor),
+            value: progress,
+            valueColor: AlwaysStoppedAnimation(color),
             strokeWidth: 12,
-            color: displayColor,
+            color: color,
             backgroundColor: Colors.black54,
           ),
           Center(
             child: BuildTime(
-                seconds: seconds,
-                state: state,
-                minutes: minutes,
-                color: displayColor),
+                seconds: seconds, state: state, minutes: minutes, color: color),
           )
         ],
       ),
     );
+    ;
   }
 }
 
@@ -271,7 +328,6 @@ class BuildTime extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedSeconds = seconds.toString().padLeft(2, '0');
-    Color textColor = color ?? Colors.indigo.shade50;
 
     return Text(
       state == workoutState.completedState
@@ -279,7 +335,7 @@ class BuildTime extends StatelessWidget {
           : '$minutes:$formattedSeconds',
       style: TextStyle(
         fontSize: 100,
-        color: textColor,
+        color: color,
         fontWeight: FontWeight.bold,
       ),
     );

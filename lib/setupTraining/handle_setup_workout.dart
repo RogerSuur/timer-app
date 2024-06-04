@@ -1,4 +1,4 @@
-import 'package:boxing_app/training.dart';
+import 'package:boxing_app/training/training.dart';
 import 'package:flutter/material.dart';
 
 class HandleSetupWorkout extends StatelessWidget {

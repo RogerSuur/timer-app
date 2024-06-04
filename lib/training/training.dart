@@ -1,3 +1,5 @@
+import 'package:boxing_app/training/control_buttons.dart';
+import 'package:boxing_app/training/round_display.dart';
 import 'package:boxing_app/training/timer_display.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -70,7 +72,9 @@ class _TrainingState extends State<Training> {
         state = workoutState.preTrainingState;
       });
 
-  void startTimer({bool reset = true}) {
+  void startTimer() {
+    print("start timer");
+    print(isPaused);
     isPaused = false;
     timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (totalSeconds > 0) {
@@ -81,19 +85,34 @@ class _TrainingState extends State<Training> {
         });
         checkState();
       } else {
-        stopTimer(reset: false);
-        print("Workout completed.");
+        stopTimer();
       }
     });
   }
 
-  void stopTimer({bool reset = true}) {
-    if (reset) {
-      resetTimer();
+  togglePause() {
+    print("togglePause function");
+    print(isPaused);
+    if (!isPaused) {
+      timer?.cancel();
+      isPaused = true;
+      setState(() {});
+    } else {
+      startTimer();
     }
-    isPaused = true;
+  }
 
+  void workoutCompleted() {
     setState(() => timer?.cancel());
+    print("Workout completed.");
+  }
+
+  void stopTimer() {
+    print("stopTImer function");
+    print(isPaused);
+    setState(() => timer?.cancel());
+    resetTimer();
+    isPaused = true;
   }
 
   //checks and changes the states of workout
@@ -167,88 +186,28 @@ class _TrainingState extends State<Training> {
                 height: 40,
               ),
               //RoundDisplay
-              showRounds(color: state == workoutState.breakState ? null : null),
+              RoundDisplay(
+                  currentRound: currentRound,
+                  totalRounds: widget.roundAmount,
+                  isBreak: isPaused,
+                  state: state,
+                  color: Colors.indigo.shade50),
               const SizedBox(
                 height: 60,
               ),
-              //ControlBUttons
-              buildButtons(),
+              //controlButtons for timer
+              ControlButtons(
+                onStart: startTimer,
+                onPause: togglePause,
+                onStop: stopTimer,
+                isPaused: isPaused,
+                state: state,
+              )
+              //buildButtons(),
             ],
           ),
         ),
       ),
     );
   }
-
-  Widget buildButtons() {
-    return state == workoutState.preTrainingState
-        ? ButtonWidget(
-            text: 'Start Workout!',
-            onClicked: () {
-              startTimer();
-            },
-          )
-        : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ButtonWidget(
-                text: isPaused ? 'Resume' : 'Pause',
-                onClicked: () {
-                  if (!isPaused) {
-                    stopTimer(reset: false);
-                  } else {
-                    startTimer(reset: false);
-                  }
-                },
-              ),
-              ButtonWidget(
-                text: 'Stop',
-                onClicked: () {
-                  stopTimer();
-                },
-              ),
-            ],
-          );
-  }
-
-  Widget showRounds({Color? color}) {
-    print("showROunds color $color");
-    Color displayColor = color ?? Colors.indigo.shade50;
-
-    print("showROunds displayColor $displayColor");
-
-    return Text(
-      state == workoutState.trainingState ||
-              state == workoutState.preTrainingState
-          ? '$currentRound/${widget.roundAmount}'
-          : 'Break',
-      style: TextStyle(
-          color: displayColor, fontWeight: FontWeight.bold, fontSize: 40),
-    );
-  }
-}
-
-class ButtonWidget extends StatelessWidget {
-  final String text;
-  final Color color;
-  final Color backgroundColor;
-  final VoidCallback onClicked;
-
-  const ButtonWidget(
-      {super.key,
-      required this.text,
-      this.color = Colors.white,
-      this.backgroundColor = const Color(0xFF00BCD4),
-      required this.onClicked});
-
-  @override
-  Widget build(BuildContext context) => ElevatedButton(
-      style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
-      onPressed: onClicked,
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 20, color: color),
-      ));
 }

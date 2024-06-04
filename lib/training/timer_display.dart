@@ -1,7 +1,8 @@
-import 'package:boxing_app/training.dart';
+import 'package:boxing_app/training/training.dart';
 import 'package:boxing_app/training/build_time.dart';
 import 'package:flutter/material.dart';
 
+//This widget will display the countdown timer and progressIndicator
 class TimerDisplay extends StatelessWidget {
   final int totalSeconds;
   final int seconds;

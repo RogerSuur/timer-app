@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-//import 'package:just_audio/just_audio.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class Training extends StatefulWidget {
@@ -243,14 +242,34 @@ class _TrainingState extends State<Training> {
             backgroundColor: Colors.black54,
           ),
           Center(
-            child: buildTime(color: displayColor),
+            child: BuildTime(
+                seconds: seconds,
+                state: state,
+                minutes: minutes,
+                color: displayColor),
           )
         ],
       ),
     );
   }
+}
 
-  Widget buildTime({Color? color}) {
+class BuildTime extends StatelessWidget {
+  const BuildTime({
+    super.key,
+    required this.seconds,
+    required this.state,
+    required this.minutes,
+    required this.color,
+  });
+
+  final int seconds;
+  final workoutState state;
+  final int minutes;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
     String formattedSeconds = seconds.toString().padLeft(2, '0');
     Color textColor = color ?? Colors.indigo.shade50;
 

@@ -1,3 +1,4 @@
+import 'package:boxing_app/setupTraining/buildTextInput.dart';
 import 'package:boxing_app/training.dart';
 import 'package:flutter/material.dart';
 
@@ -73,22 +74,21 @@ class _SetupTrainingState extends State<SetupTraining> {
                     fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              buildTextField(
-                controller: roundLengthController,
-                icon: Icons.timer,
-                label: "Round length (min)",
-              ),
+              BuildTextInput(
+                  controller: roundLengthController,
+                  icon: Icons.timer,
+                  label: "Round length (min)"),
               const SizedBox(
                 height: 10,
               ),
-              buildTextField(
+              BuildTextInput(
                   controller: breakLengthController,
                   icon: Icons.pause_circle_filled,
                   label: "Break length (min)"),
               const SizedBox(
                 height: 10,
               ),
-              buildTextField(
+              BuildTextInput(
                   controller: roundAmountController,
                   icon: Icons.repeat,
                   label: "Amount of rounds"),
@@ -110,37 +110,6 @@ class _SetupTrainingState extends State<SetupTraining> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required IconData icon,
-    required String label,
-  }) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 5),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-              color: Colors.cyanAccent, width: 1), // Underline thickness
-        ),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        style: const TextStyle(fontSize: 24, color: Colors.white),
-        decoration: InputDecoration(
-          icon: Icon(icon, color: Colors.cyanAccent),
-          labelText: label,
-          labelStyle: const TextStyle(
-              color: Colors.cyanAccent,
-              fontSize: 23,
-              fontWeight: FontWeight.bold),
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
         ),
       ),
     );

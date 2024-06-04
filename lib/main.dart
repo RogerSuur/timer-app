@@ -1,4 +1,4 @@
-import 'package:boxing_app/setupTraining.dart';
+import 'package:boxing_app/setupTraining/setupTraining.dart';
 import 'package:flutter/material.dart';
 
 void main() {

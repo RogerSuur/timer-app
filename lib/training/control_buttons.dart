@@ -1,8 +1,8 @@
-//Manages the control buttons for starting, pausing, and stopping the workout.
 import 'package:boxing_app/training/build_buttons.dart';
 import 'package:boxing_app/training/training.dart';
 import 'package:flutter/material.dart';
 
+//Manages the control buttons for starting, pausing, and stopping the workout.
 class ControlButtons extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onPause;
@@ -35,6 +35,5 @@ class ControlButtons extends StatelessWidget {
               ),
             ],
           );
-    ;
   }
 }

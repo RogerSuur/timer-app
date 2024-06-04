@@ -51,6 +51,5 @@ class TimerDisplay extends StatelessWidget {
         ],
       ),
     );
-    ;
   }
 }

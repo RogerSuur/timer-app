@@ -1,9 +1,10 @@
 import 'package:boxing_app/training/control_buttons.dart';
 import 'package:boxing_app/training/round_display.dart';
+import 'package:boxing_app/training/soundmanager.dart';
 import 'package:boxing_app/training/timer_display.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 
 class Training extends StatefulWidget {
   final int roundLength;
@@ -32,6 +33,7 @@ class _TrainingState extends State<Training> {
   int currentRound = 1;
   Timer? timer;
   var isPaused = false;
+  late SoundManager soundManager;
 
   //workout colors
   final List<Color> workoutColors = [
@@ -51,17 +53,18 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     super.initState();
+    soundManager = SoundManager();
     totalSeconds = widget.roundLength * 60;
     minutes = totalSeconds ~/ 60;
     seconds = totalSeconds % 60;
     currentColors = workoutColors;
   }
 
-  void playSound(String fileName) {
-    final audioPlayer = AudioPlayer();
-    print("PLAY SOUND " + fileName);
-    audioPlayer.play(AssetSource(fileName));
-  }
+  // void playSound(String fileName) {
+  //   final audioPlayer = AudioPlayer();
+  //   print("PLAY SOUND " + fileName);
+  //   audioPlayer.play(AssetSource(fileName));
+  // }
 
   void resetTimer() => setState(() {
         totalSeconds = widget.roundLength * 60;
@@ -120,10 +123,12 @@ class _TrainingState extends State<Training> {
     //check if client starts the workout
     if (state == workoutState.preTrainingState) {
       state = workoutState.trainingState;
-      playSound('sounds/dingdingding.mp3');
+      print("playsound at the start of the training");
+      soundManager.playSound('sounds/dingdingding.mp3');
     }
     if (totalSeconds == 10) {
-      playSound('sounds/clap.mp3');
+      print("playsound at the the 10 seconds left mark");
+      soundManager.playSound('sounds/clap.mp3');
     }
     if (totalSeconds == 0) {
       updateRoundOrBreakState();
@@ -135,16 +140,19 @@ class _TrainingState extends State<Training> {
     if (state == workoutState.breakState) {
       state = workoutState.trainingState;
       totalSeconds = widget.roundLength * 60;
-      playSound('sounds/dingdingding.mp3');
+      print("playsound at the start of the round");
+      soundManager.playSound('sounds/dingdingding.mp3');
     } else {
       //check if workout is completed
       currentRound++;
       if (currentRound > widget.roundAmount) {
         state = workoutState.completedState;
-        playSound('sounds/dingdingding.mp3');
+        print("playsound at the end of the round and workout");
+        soundManager.playSound('sounds/dingdingding.mp3');
       } else {
         state = workoutState.breakState;
-        playSound('sounds/ding.mp3');
+        print("playsound at the end of the round");
+        soundManager.playSound('sounds/ding.mp3');
         totalSeconds = widget.breakLength * 60;
       }
     }
@@ -156,6 +164,12 @@ class _TrainingState extends State<Training> {
       currentColors =
           (currentColors == workoutColors) ? breakColors : workoutColors;
     });
+  }
+
+  @override
+  void dispose() {
+    soundManager.dispose();
+    super.dispose();
   }
 
   @override
@@ -203,7 +217,6 @@ class _TrainingState extends State<Training> {
                 isPaused: isPaused,
                 state: state,
               )
-              //buildButtons(),
             ],
           ),
         ),

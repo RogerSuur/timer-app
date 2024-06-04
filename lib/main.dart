@@ -1,4 +1,4 @@
-import 'package:boxing_app/setupTraining/setupTraining.dart';
+import 'package:boxing_app/setupTraining/setup_training.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
             onPrimary: Colors.blue, onSecondary: Colors.black),
         useMaterial3: true,
       ),
-      home: SetupTraining(),
+      home: const SetupTraining(),
     );
   }
 }

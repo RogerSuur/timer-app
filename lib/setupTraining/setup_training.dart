@@ -1,5 +1,5 @@
-import 'package:boxing_app/setupTraining/buildTextInput.dart';
-import 'package:boxing_app/setupTraining/handleSetupWorkout.dart';
+import 'package:boxing_app/setupTraining/build_text_input.dart';
+import 'package:boxing_app/setupTraining/handle_setup_workout.dart';
 import 'package:flutter/material.dart';
 
 class SetupTraining extends StatefulWidget {

@@ -7,12 +7,9 @@ class SoundManager {
   static AudioPlayer audioPlayer = AudioPlayer();
 
   void playSound(String fileName) async {
-    // try {
-    //   if (audioPlayer.state == AudioPlayerState.PLAYING) {
-    //   } else {}
-    // } catch (e) {}
     audioPlayer.state;
     print("PLAY SOUND " + fileName);
+    await audioPlayer.stop();
     await audioPlayer.play(AssetSource(fileName));
   }
 

@@ -1,5 +1,5 @@
+import 'package:boxing_app/providers/TimerModel.dart';
 import 'package:boxing_app/training/build_buttons.dart';
-import 'package:boxing_app/training/training.dart';
 import 'package:flutter/material.dart';
 
 //Manages the control buttons for starting, pausing, and stopping the workout.

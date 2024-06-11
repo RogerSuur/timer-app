@@ -1,11 +1,13 @@
+import 'package:boxing_app/providers/TimerModel.dart';
 import 'package:boxing_app/training/control_buttons.dart';
 import 'package:boxing_app/training/round_display.dart';
 import 'package:boxing_app/training/soundmanager.dart';
 import 'package:boxing_app/training/timer_display.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:provider/provider.dart';
 // import 'package:audioplayers/audioplayers.dart';
 
+//displays the ui of the training
 class Training extends StatefulWidget {
   final int roundLength;
   final int breakLength;
@@ -18,23 +20,7 @@ class Training extends StatefulWidget {
   State<Training> createState() => _TrainingState();
 }
 
-enum workoutState {
-  trainingState,
-  preTrainingState,
-  breakState,
-  completedState
-}
-
 class _TrainingState extends State<Training> {
-  var state = workoutState.preTrainingState;
-  int seconds = 0;
-  int minutes = 0;
-  int totalSeconds = 0;
-  int currentRound = 1;
-  Timer? timer;
-  var isPaused = false;
-  late SoundManager soundManager;
-
   //workout colors
   final List<Color> workoutColors = [
     const Color.fromRGBO(68, 138, 255, 1),
@@ -53,173 +39,78 @@ class _TrainingState extends State<Training> {
   @override
   void initState() {
     super.initState();
-    soundManager = SoundManager();
-    totalSeconds = widget.roundLength * 60;
-    minutes = totalSeconds ~/ 60;
-    seconds = totalSeconds % 60;
     currentColors = workoutColors;
-  }
-
-  // void playSound(String fileName) {
-  //   final audioPlayer = AudioPlayer();
-  //   print("PLAY SOUND " + fileName);
-  //   audioPlayer.play(AssetSource(fileName));
-  // }
-
-  void resetTimer() => setState(() {
-        totalSeconds = widget.roundLength * 60;
-        minutes = totalSeconds ~/ 60;
-        seconds = totalSeconds % 60;
-        currentColors = workoutColors;
-        isPaused = false;
-        state = workoutState.preTrainingState;
-      });
-
-  void startTimer() {
-    print("start timer");
-    print(isPaused);
-    isPaused = false;
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (totalSeconds > 0) {
-        setState(() {
-          totalSeconds--;
-          minutes = totalSeconds ~/ 60;
-          seconds = totalSeconds % 60;
-        });
-        checkState();
-      } else {
-        stopTimer();
-      }
-    });
-  }
-
-  togglePause() {
-    print("togglePause function");
-    print(isPaused);
-    if (!isPaused) {
-      timer?.cancel();
-      isPaused = true;
-      setState(() {});
-    } else {
-      startTimer();
-    }
-  }
-
-  void workoutCompleted() {
-    setState(() => timer?.cancel());
-    print("Workout completed.");
-  }
-
-  void stopTimer() {
-    print("stopTImer function");
-    print(isPaused);
-    setState(() => timer?.cancel());
-    resetTimer();
-    isPaused = true;
-  }
-
-  //checks and changes the states of workout
-  void checkState() {
-    //check if client starts the workout
-    if (state == workoutState.preTrainingState) {
-      state = workoutState.trainingState;
-      print("playsound at the start of the training");
-      soundManager.playSound('sounds/dingdingding.mp3');
-    }
-    if (totalSeconds == 10) {
-      print("playsound at the the 10 seconds left mark");
-      soundManager.playSound('sounds/clap.mp3');
-    }
-    if (totalSeconds == 0) {
-      updateRoundOrBreakState();
-    }
-  }
-
-  //check if round or break is completed
-  void updateRoundOrBreakState() {
-    if (state == workoutState.breakState) {
-      state = workoutState.trainingState;
-      totalSeconds = widget.roundLength * 60;
-      print("playsound at the start of the round");
-      soundManager.playSound('sounds/dingdingding.mp3');
-    } else {
-      //check if workout is completed
-      currentRound++;
-      if (currentRound > widget.roundAmount) {
-        state = workoutState.completedState;
-        print("playsound at the end of the round and workout");
-        soundManager.playSound('sounds/dingdingding.mp3');
-      } else {
-        state = workoutState.breakState;
-        print("playsound at the end of the round");
-        soundManager.playSound('sounds/ding.mp3');
-        totalSeconds = widget.breakLength * 60;
-      }
-    }
-    toggleBackground();
-  }
-
-  void toggleBackground() {
-    setState(() {
-      currentColors =
-          (currentColors == workoutColors) ? breakColors : workoutColors;
-    });
   }
 
   @override
   void dispose() {
-    soundManager.dispose();
+    // soundManager.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                colors: currentColors,
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter)),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //TimerDisplay
-              TimerDisplay(
-                totalSeconds: totalSeconds,
-                seconds: seconds,
-                minutes: minutes,
-                color: Colors.indigo.shade50,
-                state: state,
-                roundLength: widget.roundLength,
-                breakLength: widget.breakLength,
+    // TimerModel timerModel = Provider.of<TimerModel>(context);
+    return ChangeNotifierProvider<TimerModel>(
+      create: (BuildContext context) => TimerModel(
+        breakLength: widget.breakLength,
+        roundLength: widget.roundLength,
+        roundAmount: widget.roundAmount,
+        workoutColors: workoutColors,
+        breakColors: breakColors,
+        soundManager: SoundManager(),
+      ),
+      child: Consumer<TimerModel>(
+        builder: (BuildContext context, timerModel, Widget? child) {
+          return Scaffold(
+            body: AnimatedContainer(
+              duration: const Duration(milliseconds: 500),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: currentColors,
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //TimerDisplay
+                    TimerDisplay(
+                      totalSeconds: timerModel.totalSeconds,
+                      seconds: timerModel.seconds,
+                      minutes: timerModel.minutes,
+                      color: Colors.indigo.shade50,
+                      state: timerModel.state,
+                      roundLength: widget.roundLength,
+                      breakLength: widget.breakLength,
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    //RoundDisplay
+                    RoundDisplay(
+                        currentRound: timerModel.currentRound,
+                        totalRounds: widget.roundAmount,
+                        isBreak: timerModel.isPaused,
+                        state: timerModel.state,
+                        color: Colors.indigo.shade50),
+                    const SizedBox(
+                      height: 60,
+                    ),
+                    //controlButtons for timer
+                    ControlButtons(
+                      onStart: () => timerModel.startTimer(),
+                      onPause: () => timerModel.togglePause(),
+                      onStop: () => timerModel.stopTimer(),
+                      isPaused: timerModel.isPaused,
+                      state: timerModel.state,
+                    )
+                  ],
+                ),
               ),
-              const SizedBox(
-                height: 40,
-              ),
-              //RoundDisplay
-              RoundDisplay(
-                  currentRound: currentRound,
-                  totalRounds: widget.roundAmount,
-                  isBreak: isPaused,
-                  state: state,
-                  color: Colors.indigo.shade50),
-              const SizedBox(
-                height: 60,
-              ),
-              //controlButtons for timer
-              ControlButtons(
-                onStart: startTimer,
-                onPause: togglePause,
-                onStop: stopTimer,
-                isPaused: isPaused,
-                state: state,
-              )
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

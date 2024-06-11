@@ -1,4 +1,4 @@
-import 'package:boxing_app/training/training.dart';
+import 'package:boxing_app/providers/TimerModel.dart';
 import 'package:flutter/material.dart';
 
 class BuildTime extends StatelessWidget {

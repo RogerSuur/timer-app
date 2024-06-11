@@ -1,5 +1,7 @@
+import 'package:boxing_app/providers/TimerModel.dart';
 import 'package:boxing_app/training/training.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HandleSetupWorkout extends StatelessWidget {
   final BuildContext context;
@@ -35,6 +37,18 @@ class HandleSetupWorkout extends StatelessWidget {
       return; // Early exit if validation fails
     }
 
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => ChangeNotifierProvider(
+    //           create: (context) => TimerModel(
+    //                 roundLength: roundLength,
+    //                 breakLength: breakLength,
+    //                 roundAmount: roundAmount,
+    //                 soundManager: SoundManager(),
+    //               ),
+    //           child: Training(roundLength, breakLength, roundAmount)),
+    //     ));
     Navigator.push(
         context,
         MaterialPageRoute(
